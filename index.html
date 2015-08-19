@@ -91,7 +91,7 @@
 
       localStorage.setItem('spreadsheet_url', url);
 
-      $.get(csvUrl, function(csv) {
+      $.get(proxyUrl, function(csv) {
         var data = Papa.parse(csv).data;
 
         $(data).each(function(i) {
