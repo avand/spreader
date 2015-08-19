@@ -87,6 +87,7 @@
       var id = url.match(/\/d\/(.*)\/edit/)[1];
       var gid = url.match(/#gid=(.*)/)[1]
       var csvUrl = 'https://docs.google.com/spreadsheets/d/' + id + '/export?gid=' + gid + '&format=csv';
+      var proxyUrl = 'http://proxy.avandamiri.com/get?url=' + encodeURIComponent(csvUrl);
 
       localStorage.setItem('spreadsheet_url', url);
 
