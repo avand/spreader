@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Spreader</title>
+    <script src="javascripts/jquery.min.js"></script>
+    <script src="javascripts/papaparse.min.js"></script>
+    <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 18px;
+      line-height: 30px;
+    }
+    input {
+      font-family: inherit;
+      font-size: inherit;
+      -webkit-appearance: none;
+      border: 1px solid black;
+      border-radius: 2px;
+      padding: .5em;
+    }
+    input[type="submit"] {
+      color: white;
+      background-color: #f17093;
+    }
+    table {
+      width: 100%;
+      margin-bottom: 1em;
+    }
+    th, td {
+      vertical-align: top;
+      padding: 0.2em;
+    }
+    .label {
+      font-size: 12px;
+      line-height: 18px;
+      color: #9f9f9f;
+      text-transform: lowercase;
+    }
+    .text {
+      font-family: Georgia;
+      margin: 0 0 .5em .25em;
+      max-width: 45em;
+      white-space: pre-wrap;
+    }
+    tr:nth-child(even) {
+      background-color: #f4f4f4;
+    }
+    .result {
+      margin-bottom: 2em;
+      padding-bottom: 2em;
+      border-bottom: 1px solid #a3a3a3;
+    }
+    </style>
+  </head>
+  <body>
+    <form>
+      <label>
+        <input type="text" placeholder="Google Spreadsheet URL" name="spreadsheet-url" class="spreadsheet-url" style="width: 240px;">
+      </label>
+
+      <input type="submit" value="Spread it">
+    </form>
+
+    <div class="results">
+    </div>
+
+    <script>
+    function createResult(headers, columns) {
+      var result = $('<div>').addClass('result').appendTo('.results')
+
+      $(columns).each(function(i) {
+        if (this.trim().length > 0) {
+          $('<div>').addClass('label').text(headers[i]).appendTo(result);
+          $('<pre>').addClass('text').text(this).appendTo(result);
+        }
+      });
+    }
+
+    $('form').submit(function(e) {
+      e.preventDefault();
+
+      var url = this['spreadsheet-url'].value;
+      var id = url.match(/\/d\/(.*)\/edit/)[1];
+      var gid = url.match(/#gid=(.*)/)[1]
+      var csvUrl = 'https://docs.google.com/spreadsheets/d/' + id + '/export?gid=' + gid + '&format=csv';
+
+      localStorage.setItem('spreadsheet_url', url);
+
+      $.get(csvUrl, function(csv) {
+        var data = Papa.parse(csv).data;
+
+        $(data).each(function(i) {
+          if (i > 0) {
+            createResult(data[0], this);
+          }
+        });
+      });
+    });
+
+    $('.spreadsheet-url').val(localStorage.getItem('spreadsheet_url'));
+    </script>
+  </body>
+</html>
